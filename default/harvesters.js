@@ -8,7 +8,6 @@
  */
 
 var _ = require('lodash');
-var helper = require('helper');
 
 
 var wantedHarvesterCount = 4

@@ -1,18 +1,12 @@
-
 let _ = require('lodash');
 
 module.exports = {
-	bodyCost,
 	findTarget,
+	changeState,
 	errString,
-	changeState
+	moveRandomStep,
+	bodyCost
 };
-
-function bodyCost(body) {
-	return body.reduce(function (cost, part) {
-		return cost + BODYPART_COST[part];
-	}, 0);
-}
 
 function findTarget(creep, selectTarget) {
 	let target
@@ -32,10 +26,6 @@ function changeState(creep, newState) {
 	creep.memory.target_id = ""
 }
 
-function errString(code) {
-	return err_codes[code]
-}
-
 let err_codes = {
 	"0": "OK",
 	"-1": "ERR_NOT_OWNER",
@@ -52,4 +42,21 @@ let err_codes = {
 	"-12": "ERR_NO_BODYPART:",
 	"-14": "ERR_RCL_NOT_ENOUGH:",
 	"-15": "ERR_GCL_NOT_ENOUGH:",
+}
+
+function errString(code) {
+	return err_codes[code]
+}
+
+var directions = ["TOP", "TOP_RIGHT", "RIGHT", "BOTTOM_RIGHT", "BOTTOM", "BOTTOM_LEFT", "LEFT", "TOP_LEFT"]
+
+function moveRandomStep(creep) {
+    var direction = _.sample(directions)
+    creep.move(direction)
+}
+
+function bodyCost(body) {
+	return body.reduce(function (cost, part) {
+		return cost + BODYPART_COST[part];
+	}, 0);
 }

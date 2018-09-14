@@ -8,8 +8,7 @@
  */
 
 let _ = require('lodash');
-let movement = require("movement")
-let helper = require("helper")
+let helper = require('helper')
 
 
 let wantedbuilderCount = 1
@@ -76,7 +75,7 @@ let states = {
 
 		let err = creep.harvest(target)
 		if (err == ERR_NOT_IN_RANGE) {
-			creep.moveTo(source, { visualizePathStyle: { stroke: '#ffffff' } })
+			creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
 			return
 		}
 	},
@@ -96,7 +95,7 @@ let states = {
 		let err = creep.build(target)
 		switch (err) {
 			case ERR_NOT_IN_RANGE:
-				creep.moveTo(target, { visualizePathStyle: { stroke: '#ffffff' } })
+				creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
 				return
 			case ERR_INVALID_TARGET:
 				creep.memory.target_id = ""
@@ -107,7 +106,7 @@ let states = {
 		let rand = _.random(0, 100)
 
 		if (rand < 10) {
-			movement.moveRandomStep(creep)
+			helper.moveRandomStep(creep)
 			return
 		}
 		if (Game.time % 20 == 0) {
