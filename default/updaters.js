@@ -10,7 +10,7 @@
 var _ = require('lodash');
 
 
-var wantedUpdaterCount = 3
+var wantedUpdaterCount = 4
 var updaterBody = [WORK, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY]
 var updaterRole = "updater"
 
@@ -34,7 +34,7 @@ module.exports = {
             localSpawn.spawnCreep(updaterBody, updaterRole + "_" + Game.time + "_" + _.random(0, 10000), {
                 memory: { role: updaterRole, harvesting: true }
             })
-
+            
         }
     },
 
