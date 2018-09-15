@@ -11,7 +11,7 @@ let _ = require('lodash');
 let helper = require('helper')
 
 
-const wantedharvesterCount = 4
+const wantedharvesterCount = 5
 const bigHarvesterBody = [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY]
 const harvesterBody = [WORK, MOVE, CARRY]
 const harvesterRole = "harvester"
@@ -19,7 +19,7 @@ const harvesterRole = "harvester"
 module.exports = {
     spawnNeeded,
     runAll,
-    selectAll    
+    selectAll
 };
 
 
@@ -64,8 +64,9 @@ function spawnNeeded() {
 }
 
 let states = {
+    //default: (creep) => { this.harvesting(creep) },
     harvesting: helper.defaultHarvesting("storing"),
-	idling: helper.defaultIdling("harvesting"),
+    idling: helper.defaultIdling("harvesting"),
 
     storing(creep) {
         if (creep.carry.energy <= 0) {
@@ -94,7 +95,7 @@ let states = {
                     creep.memory._move = ""
                 }
                 return
-            case ERR_FULL:    
+            case ERR_FULL:
             case ERR_INVALID_TARGET:
                 creep.memory.target_id = ""
         }
