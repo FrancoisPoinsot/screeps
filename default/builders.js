@@ -27,8 +27,9 @@ function runAll() {
 	_.forEach(selectAll(), function (creep) {
 		if (!creep.memory.state || !states[creep.memory.state]) {
 			console.log("could not find valid state, reset to default", creep)
-			creep.memory.state = "harvesting"
+            helper.changeState(creep, "withdrawing")
 		}
+		creep.say(creep.memory.role.substring(0,2) + " " + creep.memory.state.substring(0, 2))
 		states[creep.memory.state](creep)
 	})
 }
@@ -50,39 +51,25 @@ function spawnNeeded() {
 		err = localSpawn.spawnCreep(
 			bigBuilderBody,
 			builderRole + "_big_" + Game.time + "_" + localSpawn.id,
-			{ memory: { role: builderRole, state: "harvesting" } }
+			{ memory: { role: builderRole, state: "withdrawing" } }
 		)
 		if (err == ERR_NOT_ENOUGH_ENERGY) {
 			localSpawn.spawnCreep(
 				builderBody,
 				builderRole + "_" + Game.time + "_" + localSpawn.id,
-				{ memory: { role: builderRole, state: "harvesting" } }
+				{ memory: { role: builderRole, state: "withdrawing" } }
 			)
 		}
 	})
 }
 
 let states = {
-	harvesting(creep) {
-		if (creep.carry.energy >= creep.carryCapacity) {
-			helper.changeState(creep, "building")
-			return
-		}
-
-		let target = helper.findTarget(creep, () => {
-			return _.sample(creep.room.find(FIND_SOURCES))
-		})
-
-		let err = creep.harvest(target)
-		if (err == ERR_NOT_IN_RANGE) {
-			creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
-			return
-		}
-	},
+    withdrawing: helper.defaultWithdrawEnergy("building"),
+	idling: helper.defaultIdling("building"),
 
 	building(creep) {
 		if (creep.carry.energy <= 0) {
-			helper.changeState(creep, "harvesting")
+			helper.changeState(creep, "withdrawing")
 			return
 		}
 
@@ -96,22 +83,12 @@ let states = {
 		switch (err) {
 			case ERR_NOT_IN_RANGE:
 				creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
+				if (err == ERR_NO_PATH) {
+					creep.memory._move = ""
+				}
 				return
 			case ERR_INVALID_TARGET:
 				creep.memory.target_id = ""
-		}
-	},
-
-	idling(creep) {
-		let rand = _.random(0, 100)
-
-		if (rand < 10) {
-			helper.moveRandomStep(creep)
-			return
-		}
-		if (Game.time % 20 == 0) {
-			helper.changeState(creep, "building")
-			return
 		}
 	}
 }

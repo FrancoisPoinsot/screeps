@@ -3,7 +3,7 @@
  * module.exports.thing = 'a thing';
  *
  * You can import it from another modules like this:
- * let mod = require('harvesters');
+ * let mod = require('upgraders');
  * mod.thing == 'a thing'; // true
  */
 
@@ -11,15 +11,15 @@ let _ = require('lodash');
 let helper = require('helper')
 
 
-const wantedharvesterCount = 4
-const bigHarvesterBody = [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY]
-const harvesterBody = [WORK, MOVE, CARRY]
-const harvesterRole = "harvester"
+let wantedupgraderCount = 2
+let bigUpgraderBody = [WORK, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY]
+let upgraderBody = [WORK, MOVE, CARRY]
+let upgraderRole = "upgrader"
 
 module.exports = {
     spawnNeeded,
     runAll,
-    selectAll    
+    selectAll
 };
 
 
@@ -27,7 +27,7 @@ function runAll() {
     _.forEach(selectAll(), function (creep) {
         if (!creep.memory.state || !states[creep.memory.state]) {
             console.log("could not find valid state, reset to default", creep)
-            helper.changeState(creep, "harvesting")
+            helper.changeState(creep, "withdrawing")
         }
         creep.say(creep.memory.role.substring(0, 2) + " " + creep.memory.state.substring(0, 2))
         states[creep.memory.state](creep)
@@ -37,54 +37,42 @@ function runAll() {
 function selectAll(currentRoom) {
     return _.filter(Game.creeps, function (creep) {
         return (currentRoom == null || creep.room == currentRoom) &&
-            creep.memory.role == harvesterRole
+            creep.memory.role == upgraderRole
     })
 }
 
 function spawnNeeded() {
     _.forEach(Game.spawns, (localSpawn) => {
         let currentCreeperCount = selectAll(localSpawn.room).length;
-        if (currentCreeperCount >= wantedharvesterCount) {
+        if (currentCreeperCount >= wantedupgraderCount) {
             return;
         }
 
         err = localSpawn.spawnCreep(
-            bigHarvesterBody,
-            harvesterRole + "_big_" + Game.time + "_" + localSpawn.id,
-            { memory: { role: harvesterRole, state: "harvesting" } }
+            bigUpgraderBody,
+            upgraderRole + "_big_" + Game.time + "_" + localSpawn.id,
+            { memory: { role: upgraderRole, state: "withdrawing" } }
         )
         if (err == ERR_NOT_ENOUGH_ENERGY) {
             localSpawn.spawnCreep(
-                harvesterBody,
-                harvesterRole + "_" + Game.time + "_" + localSpawn.id,
-                { memory: { role: harvesterRole, state: "harvesting" } }
+                upgraderBody,
+                upgraderRole + "_" + Game.time + "_" + localSpawn.id,
+                { memory: { role: upgraderRole, state: "withdrawing" } }
             )
         }
     })
 }
 
 let states = {
-    harvesting: helper.defaultHarvesting("storing"),
-	idling: helper.defaultIdling("harvesting"),
+    withdrawing: helper.defaultWithdrawEnergy("upgrading"),
 
-    storing(creep) {
+    upgrading(creep) {
         if (creep.carry.energy <= 0) {
-            helper.changeState(creep, "harvesting")
+            helper.changeState(creep, "withdrawing")
             return
         }
 
-        let target = helper.findTarget(creep, () => {
-            return creep.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) &&
-                        structure.energy < structure.energyCapacity;
-                }
-            })
-        })
-        if (!target) {
-            helper.changeState(creep, "idling")
-            return
-        }
+        let target = creep.room.controller
 
         err = creep.transfer(target, RESOURCE_ENERGY)
         switch (err) {
@@ -94,7 +82,6 @@ let states = {
                     creep.memory._move = ""
                 }
                 return
-            case ERR_FULL:    
             case ERR_INVALID_TARGET:
                 creep.memory.target_id = ""
         }

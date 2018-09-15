@@ -2,18 +2,18 @@
 //var mod = require('mod');
 
 var harvesters = require("harvesters")
-var updaters = require("updaters")
+var upgraders = require("upgraders")
 var builders = require("builders")
 let _ = require('lodash')
+var helper = require("helper")
 
 module.exports.loop = function () {
-	// executed every tick
-	//mod.foo();
-
+	
 	harvesters.spawnNeeded()
 	harvesters.runAll()
-	updaters.spawnNeeded()
-	updaters.runAll()
-	builders.spawnNeeded()
+	upgraders.spawnNeeded()
+	upgraders.runAll()
+	builders.spawnNeeded() 
 	builders.runAll()
+
 }

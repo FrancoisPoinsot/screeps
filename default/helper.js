@@ -5,7 +5,10 @@ module.exports = {
 	changeState,
 	errString,
 	moveRandomStep,
-	bodyCost
+	bodyCost,
+	defaultHarvesting,
+	defaultIdling,
+	defaultWithdrawEnergy
 };
 
 function findTarget(creep, selectTarget) {
@@ -48,15 +51,82 @@ function errString(code) {
 	return err_codes[code]
 }
 
-var directions = ["TOP", "TOP_RIGHT", "RIGHT", "BOTTOM_RIGHT", "BOTTOM", "BOTTOM_LEFT", "LEFT", "TOP_LEFT"]
+var directions = [TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT]
 
 function moveRandomStep(creep) {
-    var direction = _.sample(directions)
-    creep.move(direction)
+	var direction = _.sample(directions)
+	let err = creep.move(direction)
 }
 
 function bodyCost(body) {
 	return body.reduce(function (cost, part) {
 		return cost + BODYPART_COST[part];
 	}, 0);
+}
+
+function defaultHarvesting(nextState) {
+	return (creep) => {
+		if (creep.carry.energy >= creep.carryCapacity) {
+			changeState(creep, nextState)
+			return
+		}
+
+		let target = findTarget(creep, () => {
+			return creep.pos.findClosestByRange(FIND_SOURCES)
+		})
+
+		let err = creep.harvest(target)
+		if (err == ERR_NOT_IN_RANGE) {
+			err = creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
+			if (err == ERR_NO_PATH) {
+				creep.memory._move = ""
+			}
+			return
+		}
+	}
+}
+
+function defaultIdling(nextState) {
+	return (creep) => {
+		let rand = _.random(0, 100)
+
+		if (rand < 5) {
+			moveRandomStep(creep)
+			return
+		}
+		if (Game.time % 20 == 0) {
+			changeState(creep, nextState)
+			return
+		}
+	}
+}
+
+function defaultWithdrawEnergy(nextState) {
+	return (creep) => {
+		if (creep.carry.energy >= creep.carryCapacity) {
+			changeState(creep, nextState)
+			return
+		}
+
+		let target = findTarget(creep, () => {
+			return creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+				filter: (structure) => {
+					return (structure.structureType == STRUCTURE_EXTENSION) &&
+						structure.energy > 0;
+				}
+			})
+		})
+
+		let err = creep.withdraw(target, RESOURCE_ENERGY)
+		switch (err) {
+			case ERR_NOT_IN_RANGE:
+				err = creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
+				if (err == ERR_NO_PATH) {
+					creep.memory._move = ""
+				}
+			case ERR_NOT_ENOUGH_RESOURCES:
+			case ERR_INVALID_TARGET:
+				creep.memory.target_id = ""
+		}
+	}
 }
