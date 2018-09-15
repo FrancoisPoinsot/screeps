@@ -17,6 +17,7 @@ const requiredHarvestersPerSource = 3
 const creepSpecs = {
 	"harvester": [
 		{ name: "harvester_big", body: [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY] },
+		{ name: "harvester_medium", body: [WORK, WORK, MOVE, CARRY] },
 		{ name: "harvester", body: [WORK, MOVE, CARRY] }
 	],
 	"upgrader": [
