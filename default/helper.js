@@ -6,7 +6,6 @@ module.exports = {
 	errString,
 	moveRandomStep,
 	bodyCost,
-	defaultHarvesting,
 	defaultIdling,
 	defaultWithdrawEnergy
 };
@@ -62,28 +61,6 @@ function bodyCost(body) {
 	return body.reduce(function (cost, part) {
 		return cost + BODYPART_COST[part];
 	}, 0);
-}
-
-function defaultHarvesting(nextState) {
-	return (creep) => {
-		if (creep.carry.energy >= creep.carryCapacity) {
-			changeState(creep, nextState)
-			return
-		}
-
-		let target = findTarget(creep, () => {
-			return creep.pos.findClosestByRange(FIND_SOURCES)
-		})
-
-		let err = creep.harvest(target)
-		if (err == ERR_NOT_IN_RANGE) {
-			err = creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
-			if (err == ERR_NO_PATH) {
-				creep.memory._move = ""
-			}
-			return
-		}
-	}
 }
 
 function defaultIdling(nextState) {

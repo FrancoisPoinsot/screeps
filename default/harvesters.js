@@ -38,9 +38,32 @@ function selectAll(currentRoom) {
 
 let states = {
     //default: (creep) => { this.harvesting(creep) },
-    harvesting: helper.defaultHarvesting("storing"),
     idling: helper.defaultIdling("harvesting"),
 
+    harvesting: (creep) => {
+        if (creep.carry.energy >= creep.carryCapacity) {
+            helper.changeState(creep, "storing")
+            return
+        }
+
+        // harvesters preferably use source allocated to them by lieutenant
+        // if none, they pick the nearest one
+        let target = helper.findTarget(creep, () => {
+            if (creep.memory.allocated_to){
+                return Game.getObjectById(creep.memory.allocated_to)
+            }
+            return creep.pos.findClosestByRange(FIND_SOURCES)
+        })
+
+        let err = creep.harvest(target)
+        if (err == ERR_NOT_IN_RANGE) {
+            err = creep.moveTo(target, { reusePath: 1000, visualizePathStyle: { stroke: '#ffffff' } })
+            if (err == ERR_NO_PATH) {
+                creep.memory._move = ""
+            }
+            return
+        }
+    },
     storing(creep) {
         if (creep.carry.energy <= 0) {
             helper.changeState(creep, "harvesting")
