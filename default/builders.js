@@ -10,14 +10,9 @@
 let _ = require('lodash');
 let helper = require('helper')
 
-
-let wantedbuilderCount = 1
-let builderBody = [WORK, CARRY, MOVE]
-let bigBuilderBody = [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
 let builderRole = "builder"
 
 module.exports = {
-	spawnNeeded,
 	runAll,
 	selectAll
 };
@@ -38,28 +33,6 @@ function selectAll(currentRoom) {
 	return _.filter(Game.creeps, function (creep) {
 		return (currentRoom == null || creep.room == currentRoom) &&
 			creep.memory.role == builderRole
-	})
-}
-
-function spawnNeeded() {
-	_.forEach(Game.spawns, (localSpawn) => {
-		let currentCreeperCount = selectAll(localSpawn.room).length;
-		if (currentCreeperCount >= wantedbuilderCount) {
-			return;
-		}
-
-		err = localSpawn.spawnCreep(
-			bigBuilderBody,
-			builderRole + "_big_" + Game.time + "_" + localSpawn.id,
-			{ memory: { role: builderRole, state: "withdrawing" } }
-		)
-		if (err == ERR_NOT_ENOUGH_ENERGY) {
-			localSpawn.spawnCreep(
-				builderBody,
-				builderRole + "_" + Game.time + "_" + localSpawn.id,
-				{ memory: { role: builderRole, state: "withdrawing" } }
-			)
-		}
 	})
 }
 

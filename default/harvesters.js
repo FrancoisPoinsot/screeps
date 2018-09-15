@@ -10,17 +10,12 @@
 let _ = require('lodash');
 let helper = require('helper')
 
-
-const wantedharvesterCount = 5
-const bigHarvesterBody = [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY]
-const harvesterBody = [WORK, MOVE, CARRY]
 const harvesterRole = "harvester"
 
 module.exports = {
-    spawnNeeded,
     runAll,
     selectAll
-};
+}
 
 
 function runAll() {
@@ -38,28 +33,6 @@ function selectAll(currentRoom) {
     return _.filter(Game.creeps, function (creep) {
         return (currentRoom == null || creep.room == currentRoom) &&
             creep.memory.role == harvesterRole
-    })
-}
-
-function spawnNeeded() {
-    _.forEach(Game.spawns, (localSpawn) => {
-        let currentCreeperCount = selectAll(localSpawn.room).length;
-        if (currentCreeperCount >= wantedharvesterCount) {
-            return;
-        }
-
-        err = localSpawn.spawnCreep(
-            bigHarvesterBody,
-            harvesterRole + "_big_" + Game.time + "_" + localSpawn.id,
-            { memory: { role: harvesterRole, state: "harvesting" } }
-        )
-        if (err == ERR_NOT_ENOUGH_ENERGY) {
-            localSpawn.spawnCreep(
-                harvesterBody,
-                harvesterRole + "_" + Game.time + "_" + localSpawn.id,
-                { memory: { role: harvesterRole, state: "harvesting" } }
-            )
-        }
     })
 }
 

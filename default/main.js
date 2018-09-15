@@ -1,5 +1,5 @@
 // executed on new global 
-//var mod = require('mod');
+// var mod = require('mod');
 
 var harvesters = require("harvesters")
 var upgraders = require("upgraders")
@@ -15,11 +15,8 @@ module.exports.loop = function () {
 	}
 	lieutenants.spawnAllNeeded()
 
-	// harvesters.spawnNeeded()
 	harvesters.runAll()
-	upgraders.spawnNeeded()
 	upgraders.runAll()
-	builders.spawnNeeded() 
 	builders.runAll()
 
 }
