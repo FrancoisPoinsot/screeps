@@ -50,7 +50,7 @@ function assessNeededCreeps(room) {
 
 		// builders
 		constructionSites = room.find(FIND_CONSTRUCTION_SITES)
-		neededCreeps["builder"] = Math.min(Math.ceil(constructionSites.length / 5), 4)
+		neededCreeps["builder"] = Math.min(Math.ceil(constructionSites.length / 5), 3)
 
 		// upgraders
 		neededCreeps["upgrader"] = 4
