@@ -9,11 +9,12 @@ var towers = require("towers")
 var helper = require("helper")
 let _ = require('lodash')
 
-module.exports.loop = function () {
 
-	if(Game.time % 100 == 0){
+module.exports.loop = function () {
+	if (Game.time % 100 == 0) {
 		lieutenants.sampleRooms()
 		lieutenants.allocateHarvestersToSource()
+		lieutenants.buildAllNeededRoads()		
 	}
 	lieutenants.spawnAllNeeded()
 
@@ -22,5 +23,4 @@ module.exports.loop = function () {
 	builders.runAll()
 	towers.runAll()
 
-	// TODO memory clean up. At least creeps
 }

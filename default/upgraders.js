@@ -9,6 +9,7 @@
 
 let _ = require('lodash');
 let helper = require('helper')
+let roads = require('roads')
 
 let upgraderRole = "upgrader"
 
@@ -54,6 +55,7 @@ let states = {
                 if (err == ERR_NO_PATH) {
                     creep.memory._move = ""
                 }
+                roads.ensureRoadExist(creep.pos)
                 return
             case ERR_INVALID_TARGET:
                 creep.memory.target_id = ""

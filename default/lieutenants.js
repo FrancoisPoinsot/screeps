@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const helper = require('helper')
+const roads = require('roads')
 
 // lieutenant is room level
 // try not to micro manage. He rather allocate creeps to role or area
@@ -8,7 +9,8 @@ const helper = require('helper')
 module.exports = {
 	sampleRooms,
 	spawnAllNeeded,
-	allocateHarvestersToSource
+	allocateHarvestersToSource,
+	buildAllNeededRoads
 };
 
 const requiredHarvestersPerSource = 3
@@ -146,5 +148,24 @@ function allocateHarvestersToSource() {
 				}
 			})
 		})
+	})
+}
+
+function buildAllNeededRoads(role, room) {
+	_.forEach(Game.rooms, (room) => {
+		buildNeededRoads(room)
+	})
+}
+
+function buildNeededRoads(room) {
+	let roadRequests = roads.getRequestedRoads(room)
+	_.forEach(roadRequests, (request, key) => {
+		if (request.x && request.y) {
+			roomPosition = room.getPositionAt(request.x, request.y)
+			if (roads.canBuildRoad(roomPosition)) {
+				room.createConstructionSite(roomPosition, STRUCTURE_ROAD)
+			}
+		}
+		delete roadRequests[key]
 	})
 }
