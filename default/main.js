@@ -14,7 +14,7 @@ module.exports.loop = function () {
 	if (Game.time % 100 == 0) {
 		lieutenants.sampleRooms()
 		lieutenants.allocateHarvestersToSource()
-		lieutenants.buildAllNeededRoads()		
+		lieutenants.buildAllNeededRoads()
 	}
 	lieutenants.spawnAllNeeded()
 
@@ -23,4 +23,14 @@ module.exports.loop = function () {
 	builders.runAll()
 	towers.runAll()
 
+	cleanupMemory()
+}
+
+function cleanupMemory() {
+	for (var name in Memory.creeps) {
+		if (!Game.creeps[name]) {
+			delete Memory.creeps[name];
+			console.log('Clearing non-existing creep memory:', name);
+		}
+	}
 }
