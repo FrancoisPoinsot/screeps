@@ -85,6 +85,10 @@ function defaultWithdrawEnergy(nextState) {
 			return
 		}
 
+		if (creep.room.energyAvailable < 300){
+			return
+		}
+
 		let target = findTarget(creep, () => {
 			return creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
 				filter: (structure) => {

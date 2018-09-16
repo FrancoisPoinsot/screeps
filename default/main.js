@@ -11,7 +11,7 @@ let _ = require('lodash')
 
 
 module.exports.loop = function () {
-	if (Game.time % 100 == 0) {
+	if (Game.time % 20 == 0) {
 		lieutenants.sampleRooms()
 		lieutenants.allocateHarvestersToSource()
 		lieutenants.buildAllNeededRoads()
